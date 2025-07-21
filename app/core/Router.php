@@ -2,23 +2,23 @@
 
 class Router {
     public function run() {
-        $controllerName = $_GET['c'] ?? 'produto';
-        $method = $_GET['m'] ?? 'index';
+        $url = $_GET['url'] ?? 'produto/index';
+        $url = explode('/', filter_var(rtrim($url, '/'), FILTER_SANITIZE_URL));
 
-        $controllerClass = ucfirst($controllerName).'Controller';
-        $controllerFile = "../app/controllers/{$controllerClass}.php";
+        $controller = ucfirst($url[0]) . 'Controller';
+        $method = $url[1] ?? 'index';
 
-        if(file_exists($controllerFile)) {
-            require_once $controllerFile;
-            $controller = new $controllerClass();
-
-            if(method_exists($controller, $method)) {
-                $controller->$method();
-            } else {
-                echo "Método $method não encontrado.";
+        $controllerPath = '../app/controllers/' . $controller . '.php';
+        if (file_exists($controllerPath)) {
+            require_once $controllerPath;
+            $controllerInstance = new $controller;
+            if (method_exists($controllerInstance, $method)) {
+                $controllerInstance->$method();
+                return;
             }
-        } else {
-            echo "Controller $controllerClass não encontrado.";
         }
+
+        http_response_code(404);
+        echo "Página não encontrada";
     }
 }
