@@ -36,6 +36,7 @@
         <a class="navbar-brand" href="/">Mini ERP</a>
         <div>
             <a href="/produtos/novo" class="btn btn-outline-light">Novo Produto</a>
+            <a href="/coupons" class="btn btn-info">Gerenciar Cupons</a>
         </div>
     </div>
 </nav>

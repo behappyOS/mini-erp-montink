@@ -3,6 +3,15 @@
 <div class="container py-4 text-light">
     <h2 class="mb-4">Gerenciar Cupons</h2>
 
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div class="alert alert-success"><?= $_SESSION['success'] ?></div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="alert alert-danger"><?= $_SESSION['error'] ?></div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+
     <form method="POST" action="/coupons/store" class="mb-4">
         <div class="mb-3">
             <label for="codigo" class="form-label">Código</label>
@@ -15,7 +24,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="minimo" class="form-label">Valor Mínimo</label>
+            <label for="minimo" class="form-label">Valor Mínimo (R$)</label>
             <input type="number" step="0.01" id="minimo" name="minimo" class="form-control" placeholder="Valor mínimo" required>
         </div>
 
@@ -33,9 +42,9 @@
             <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center">
                 <div>
                     <strong><?= htmlspecialchars($c['codigo']) ?></strong> -
-                    R$ <?= number_format($c['valor'], 2, ',', '.') ?>
+                    <?= number_format($c['desconto'], 2, ',', '.') ?>% de desconto -
                     (mín: R$ <?= number_format($c['minimo'], 2, ',', '.') ?>) -
-                    até <?= date('d/m/Y', strtotime($c['validade'])) ?>
+                    válido até <?= date('d/m/Y', strtotime($c['validade'])) ?>
                 </div>
                 <form action="/coupons/delete" method="POST" onsubmit="return confirm('Deseja realmente excluir este cupom?');" class="mb-0">
                     <input type="hidden" name="id" value="<?= $c['id'] ?>">

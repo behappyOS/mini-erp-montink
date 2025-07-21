@@ -59,22 +59,90 @@
             </form>
         </div>
 
-        <?php if (isset($cupom)): ?>
-            <?php
+        <?php
+        $desconto = 0;
+        if (isset($cupom)) {
             $desconto = $total * ($cupom['desconto'] / 100);
-            $total_com_desconto = $total - $desconto;
-            ?>
+        }
+        $subtotal_com_desconto = $total - $desconto;
+
+        // Cálculo do frete baseado no subtotal com desconto
+        if ($subtotal_com_desconto >= 52 && $subtotal_com_desconto <= 166.59) {
+            $frete = 15.00;
+        } elseif ($subtotal_com_desconto > 200) {
+            $frete = 0.00;
+        } else {
+            $frete = 20.00;
+        }
+
+        $total_final = $subtotal_com_desconto + $frete;
+        ?>
+
+        <p><strong>Subtotal:</strong> R$ <?= number_format($total, 2, ',', '.') ?></p>
+        <?php if (isset($cupom)): ?>
             <p><strong>Cupom aplicado:</strong> <?= htmlspecialchars($cupom['codigo']) ?> (<?= $cupom['desconto'] ?>% de desconto)</p>
             <p><strong>Desconto:</strong> R$ <?= number_format($desconto, 2, ',', '.') ?></p>
-            <p><strong>Total com Desconto:</strong> R$ <?= number_format($total_com_desconto, 2, ',', '.') ?></p>
-        <?php else: ?>
-            <p><strong>Total:</strong> R$ <?= number_format($total, 2, ',', '.') ?></p>
+            <p><strong>Subtotal com desconto:</strong> R$ <?= number_format($subtotal_com_desconto, 2, ',', '.') ?></p>
         <?php endif; ?>
+        <p><strong>Frete:</strong> R$ <?= number_format($frete, 2, ',', '.') ?></p>
+        <p><strong>Total a pagar:</strong> R$ <?= number_format($total_final, 2, ',', '.') ?></p>
+
+        <hr>
+
+        <!-- CEP -->
+        <div class="mb-4">
+            <label for="cep" class="form-label">Informe seu CEP para calcular o frete e endereço:</label>
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" id="cep" class="form-control" placeholder="Ex: 01001000" maxlength="8" pattern="\d{8}" required>
+                <button class="btn btn-secondary" id="btnBuscarCep">Buscar</button>
+            </div>
+            <div id="endereco" class="mt-2"></div>
+            <div id="erroCep" class="text-danger mt-2"></div>
+        </div>
 
         <form action="/pedido/finalizar" method="POST">
+            <input type="hidden" name="frete" value="<?= $frete ?>">
+            <input type="hidden" name="cupom_codigo" value="<?= htmlspecialchars($cupom['codigo'] ?? '') ?>">
             <button type="submit" class="btn btn-success btn-lg mt-3">Finalizar Pedido</button>
         </form>
     <?php endif; ?>
 </div>
+
+<script>
+    document.getElementById('btnBuscarCep').addEventListener('click', function(e) {
+        e.preventDefault();
+        const cep = document.getElementById('cep').value.trim();
+
+        const erroCep = document.getElementById('erroCep');
+        const enderecoDiv = document.getElementById('endereco');
+
+        erroCep.textContent = '';
+        enderecoDiv.textContent = '';
+
+        // Validação simples do CEP (8 dígitos numéricos)
+        if (!/^\d{8}$/.test(cep)) {
+            erroCep.textContent = 'Por favor, informe um CEP válido com 8 números.';
+            return;
+        }
+
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.erro) {
+                    erroCep.textContent = 'CEP não encontrado.';
+                    return;
+                }
+
+                enderecoDiv.innerHTML = `
+                    <strong>Endereço encontrado:</strong><br>
+                    ${data.logradouro}, ${data.bairro}<br>
+                    ${data.localidade} - ${data.uf}
+                `;
+            })
+            .catch(() => {
+                erroCep.textContent = 'Erro ao consultar o CEP. Tente novamente.';
+            });
+    });
+</script>
 
 <?php include 'app/views/layout/footer.php'; ?>
