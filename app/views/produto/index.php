@@ -25,6 +25,9 @@
                     <button type="submit">Adicionar</button>
                 </form>
             </td>
+            <td>
+                <a href="/produtos/editar?id=<?= $p['id'] ?>">Editar</a>
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>

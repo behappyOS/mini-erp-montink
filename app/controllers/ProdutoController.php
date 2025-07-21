@@ -73,7 +73,7 @@ class ProdutoController
         $id = $_POST['id'] ?? null;
         $nome = $_POST['nome'] ?? '';
         $preco = $_POST['preco'] ?? 0;
-        $quantidade = $_POST['quantidade'] ?? 0;
+        $quantidade = $_POST['estoque'] ?? 0;
 
         if (!$id) {
             header('Location: /produtos');
@@ -88,9 +88,7 @@ class ProdutoController
             'preco' => $preco,
         ]);
 
-        $estoqueModel->updateByProduto($id, [
-            'quantidade' => $quantidade,
-        ]);
+        $estoqueModel->updateByProduto($id, $quantidade);
 
         header('Location: /produtos');
     }

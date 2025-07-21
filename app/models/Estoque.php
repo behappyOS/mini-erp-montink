@@ -19,7 +19,7 @@ class Estoque extends Model
         return $stmt->execute([$produtoId, $quantidade]);
     }
 
-    public function update($produtoId, $quantidade)
+    public function updateByProduto($produtoId, $quantidade)
     {
         $stmt = $this->pdo->prepare("UPDATE {$this->table} SET quantidade = ? WHERE produto_id = ?");
         return $stmt->execute([$quantidade, $produtoId]);
