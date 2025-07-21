@@ -1,43 +1,79 @@
-<?php include '../app/views/layout/header.php'; ?>
+<?php include 'app/views/layout/header.php'; ?>
 
-<h2>Cadastro de Produtos</h2>
+<h2 class="mb-4"><?= isset($produto) ? 'Editar' : 'Cadastrar' ?> Produto</h2>
 
-<form method="post" action="?c=produto&m=store">
+<form action="<?= isset($produto) ? '/produtos/atualizar' : '/produtos/salvar' ?>" method="POST" class="needs-validation" novalidate>
+    <?php if (isset($produto)): ?>
+        <input type="hidden" name="id" value="<?= htmlspecialchars($produto['id']) ?>">
+    <?php endif; ?>
+
     <div class="mb-3">
-        <label for="nome" class="form-label">Nome do Produto</label>
-        <input type="text" class="form-control" name="nome" required>
+        <label for="nome" class="form-label">Nome</label>
+        <input
+                type="text"
+                class="form-control"
+                id="nome"
+                name="nome"
+                value="<?= htmlspecialchars($produto['nome'] ?? '') ?>"
+                required
+        >
+        <div class="invalid-feedback">
+            Por favor, insira o nome do produto.
+        </div>
     </div>
+
     <div class="mb-3">
-        <label for="preco" class="form-label">Preço</label>
-        <input type="number" step="0.01" class="form-control" name="preco" required>
+        <label for="preco" class="form-label">Preço (R$)</label>
+        <input
+                type="number"
+                step="0.01"
+                class="form-control"
+                id="preco"
+                name="preco"
+                value="<?= htmlspecialchars($produto['preco'] ?? '') ?>"
+                required
+        >
+        <div class="invalid-feedback">
+            Por favor, insira o preço do produto.
+        </div>
     </div>
+
     <div class="mb-3">
         <label for="estoque" class="form-label">Estoque</label>
-        <input type="number" class="form-control" name="estoque" required>
+        <input
+                type="number"
+                class="form-control"
+                id="estoque"
+                name="estoque"
+                value="<?= htmlspecialchars($produto['quantidade'] ?? '') ?>"
+                min="0"
+                required
+        >
+        <div class="invalid-feedback">
+            Por favor, insira a quantidade em estoque.
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Salvar Produto</button>
+
+    <button type="submit" class="btn btn-primary">
+        <?= isset($produto) ? 'Atualizar' : 'Salvar' ?>
+    </button>
+    <a href="/produtos" class="btn btn-secondary ms-2">Cancelar</a>
 </form>
 
-<hr>
+<script>
+    (() => {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })();
+</script>
 
-<h3>Produtos Cadastrados</h3>
-<table class="table table-bordered">
-    <thead>
-    <tr>
-        <th>Nome</th>
-        <th>Preço</th>
-        <th>Estoque</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($produtos as $produto): ?>
-        <tr>
-            <td><?= $produto['nome'] ?></td>
-            <td>R$ <?= number_format($produto['preco'], 2, ',', '.') ?></td>
-            <td><?= $produto['estoque'] ?></td>
-        </tr>
-    <?php endforeach; ?>
-    </tbody>
-</table>
-
-<?php include '../app/views/layout/footer.php'; ?>
+<?php include 'app/views/layout/footer.php'; ?>
