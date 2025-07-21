@@ -1,0 +1,32 @@
+<?php
+
+require_once 'app/core/Model.php';
+
+class Pedido extends Model
+{
+    protected $table = 'pedidos';
+
+    public function create($dados)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO {$this->table} (produtos, total, cep, endereco, status) VALUES (?, ?, ?, ?, ?)");
+        return $stmt->execute([
+            $dados['produtos'],
+            $dados['total'],
+            $dados['cep'],
+            $dados['endereco'],
+            $dados['status'] ?? 'pendente'
+        ]);
+    }
+
+    public function updateStatus($id, $status)
+    {
+        $stmt = $this->pdo->prepare("UPDATE {$this->table} SET status = ? WHERE id = ?");
+        return $stmt->execute([$status, $id]);
+    }
+
+    public function delete($id)
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+}

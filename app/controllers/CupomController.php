@@ -1,15 +1,14 @@
 <?php
-require_once 'models/Coupon.php';
 
-class CupomController {
-    public function index() {
-        $coupons = (new Coupon())->all();
-        include 'views/coupons/index.php';
-    }
+require_once 'app/models/Cupom.php';
 
-    public function store() {
-        $data = $_POST;
-        (new Coupon())->create($data);
-        header('Location: /coupons');
+class CupomController
+{
+    public function validar($codigo, $subtotal)
+    {
+        $cupom = new Cupom();
+        $valido = $cupom->validar($codigo, $subtotal);
+
+        echo json_encode($valido);
     }
 }
