@@ -1,7 +1,7 @@
 <?php
 require_once 'models/Coupon.php';
 
-class CouponController {
+class CupomController {
     public function index() {
         $coupons = (new Coupon())->all();
         include 'views/coupons/index.php';
