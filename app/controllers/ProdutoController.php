@@ -7,7 +7,15 @@ class ProdutoController
     public function index()
     {
         $produtoModel = new Produto();
+        $estoqueModel = new Estoque();
+
         $produtos = $produtoModel->all();
+
+        foreach ($produtos as &$produto) {
+            $estoque = $estoqueModel->findByProduto($produto['id']);
+            $produto['quantidade'] = $estoque['quantidade'] ?? 0;
+        }
+
         require __DIR__ . '/../views/produto/index.php';
     }
 
@@ -45,7 +53,7 @@ class ProdutoController
     {
         $nome = $_POST['nome'] ?? '';
         $preco = $_POST['preco'] ?? 0;
-        $quantidade = $_POST['quantidade'] ?? 0;
+        $quantidade = $_POST['estoque'] ?? 0;
 
         $produtoModel = new Produto();
         $estoqueModel = new Estoque();
