@@ -101,4 +101,44 @@ class PedidoController
         }
         require __DIR__ . '/../views/pedido/finalizar.php';
     }
+
+    public function webhook()
+    {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        if (!$data || !isset($data['pedido_id']) || !isset($data['status'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Dados inválidos: pedido_id e status são obrigatórios.']);
+            return;
+        }
+
+        $pedidoId = (int)$data['pedido_id'];
+        $status = $data['status'];
+
+        require_once __DIR__ . '/../models/Pedido.php';
+        $pedidoModel = new Pedido();
+
+        try {
+            if ($status === 'cancelado') {
+                $pedidoModel->delete($pedidoId);
+                $response = ['message' => "Pedido #$pedidoId removido com sucesso."];
+            } else {
+                $pedidoModel->updateStatus($pedidoId, $status);
+                $response = ['message' => "Pedido #$pedidoId atualizado para status '$status'."];
+            }
+
+            header('Content-Type: application/json');
+            echo json_encode($response);
+
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Erro interno: ' . $e->getMessage()]);
+        }
+    }
+
 }
