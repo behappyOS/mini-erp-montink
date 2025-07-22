@@ -103,6 +103,19 @@
         <form action="/pedido/finalizar" method="POST">
             <input type="hidden" name="frete" value="<?= $frete ?>">
             <input type="hidden" name="cupom_codigo" value="<?= htmlspecialchars($cupom['codigo'] ?? '') ?>">
+
+            <div class="mb-3" style="max-width: 400px;">
+                <label for="email" class="form-label">Seu e-mail:</label>
+                <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-control"
+                        placeholder="seu@email.com"
+                        required
+                >
+            </div>
+            
             <button type="submit" class="btn btn-success btn-lg mt-3">Finalizar Pedido</button>
         </form>
     <?php endif; ?>

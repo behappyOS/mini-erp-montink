@@ -8,9 +8,10 @@ class Pedido extends Model
 
     public function create($dados)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO {$this->table} (produtos, total, cep, endereco, status) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $this->pdo->prepare("INSERT INTO {$this->table} (email_cliente, produtos, total, cep, endereco, status) VALUES (?, ?, ?, ?, ?, ?)");
         return $stmt->execute([
-            $dados['produtos'],
+            $dados['email_cliente'],
+            json_encode($dados['produtos']),
             $dados['total'],
             $dados['cep'],
             $dados['endereco'],
