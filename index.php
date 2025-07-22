@@ -6,7 +6,6 @@ require_once __DIR__ . '/app/core/Router.php';
 
 $router = new Router();
 
-// Redireciona '/' para '/produtos'
 if ($_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] === '') {
     header('Location: /produtos');
     exit;
@@ -28,5 +27,6 @@ $router->post('/carrinho/adicionar', 'CarrinhoController@adicionar');
 $router->post('/carrinho/remover', 'CarrinhoController@remover');
 $router->post('/carrinho/aplicar-cupom', 'CarrinhoController@aplicarCupom');
 $router->post('/pedido/finalizar', 'PedidoController@checkout');
+$router->post('/pedido/webhook', 'PedidoController@webhook');
 
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
