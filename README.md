@@ -27,3 +27,5 @@ Este é um projeto completo de mini ERP para controle de produtos, pedidos e cup
 git clone https://github.com/behappyOS/mini-erp-montink.git
 cd mini-erp-php
 docker-compose up -d
+docker exec -it mini-erp-php bash
+php database/migrate.php
