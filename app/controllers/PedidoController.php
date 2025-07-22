@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../models/Pedido.php';
 require_once __DIR__ . '/../models/Produto.php';
 require_once __DIR__ . '/../models/Estoque.php';
+require_once 'app/helpers/EmailHelper.php';
 
 class PedidoController
 {
@@ -75,6 +76,15 @@ class PedidoController
                 $estoqueModel->updateByProduto($produtoId, $novaQuantidade);
             }
         }
+
+        EmailHelper::enviarConfirmacaoPedido(
+            $email,
+            'Cliente',
+            $pedidoId,
+            number_format($total, 2, ',', '.'),
+            $endereco,
+            $cep
+        );
 
         unset($_SESSION['carrinho']);
         unset($_SESSION['cupom']);
