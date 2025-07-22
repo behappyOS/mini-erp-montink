@@ -8,14 +8,17 @@ class Pedido extends Model
 
     public function create($dados)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO {$this->table} (produtos, total, cep, endereco, status) VALUES (?, ?, ?, ?, ?)");
-        return $stmt->execute([
-            $dados['produtos'],
+        $stmt = $this->pdo->prepare("INSERT INTO {$this->table} (email_cliente, produtos, total, cep, endereco, status) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $dados['email_cliente'],
+            json_encode($dados['produtos']),
             $dados['total'],
             $dados['cep'],
             $dados['endereco'],
             $dados['status'] ?? 'pendente'
         ]);
+
+        return $this->pdo->lastInsertId();
     }
 
     public function updateStatus($id, $status)

@@ -103,6 +103,20 @@
         <form action="/pedido/finalizar" method="POST">
             <input type="hidden" name="frete" value="<?= $frete ?>">
             <input type="hidden" name="cupom_codigo" value="<?= htmlspecialchars($cupom['codigo'] ?? '') ?>">
+            <input type="hidden" name="cep" id="inputCep" value="">
+            <input type="hidden" name="endereco" id="inputEndereco" value="">
+            <div class="mb-3" style="max-width: 400px;">
+                <label for="email" class="form-label">Seu e-mail:</label>
+                <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-control"
+                        placeholder="seu@email.com"
+                        required
+                >
+            </div>
+
             <button type="submit" class="btn btn-success btn-lg mt-3">Finalizar Pedido</button>
         </form>
     <?php endif; ?>
@@ -119,7 +133,6 @@
         erroCep.textContent = '';
         enderecoDiv.textContent = '';
 
-        // Validação simples do CEP (8 dígitos numéricos)
         if (!/^\d{8}$/.test(cep)) {
             erroCep.textContent = 'Por favor, informe um CEP válido com 8 números.';
             return;
@@ -138,6 +151,9 @@
                     ${data.logradouro}, ${data.bairro}<br>
                     ${data.localidade} - ${data.uf}
                 `;
+
+                document.getElementById('inputCep').value = cep;
+                document.getElementById('inputEndereco').value = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
             })
             .catch(() => {
                 erroCep.textContent = 'Erro ao consultar o CEP. Tente novamente.';

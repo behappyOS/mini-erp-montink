@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/Pedido.php';
 require_once __DIR__ . '/../models/Produto.php';
+require_once __DIR__ . '/../models/Estoque.php';
 
 class PedidoController
 {
@@ -8,8 +9,11 @@ class PedidoController
     {
         $cep = $_POST['cep'] ?? '';
         $endereco = $_POST['endereco'] ?? '';
-        $cidade = $_POST['cidade'] ?? '';
-        $estado = $_POST['estado'] ?? '';
+        $email = $_POST['email'] ?? null;
+
+        if (!$email) {
+            die("Email é obrigatório para finalizar o pedido.");
+        }
 
         $carrinho = $_SESSION['carrinho'] ?? [];
         $cupom = $_SESSION['cupom'] ?? null;
@@ -29,7 +33,6 @@ class PedidoController
             }
         }
 
-        // Calcular frete
         $frete = 20.0;
         if ($subtotal >= 52.0 && $subtotal <= 166.59) {
             $frete = 15.0;
@@ -37,7 +40,6 @@ class PedidoController
             $frete = 0.0;
         }
 
-        // Aplicar desconto do cupom se existir
         $desconto = 0.0;
         if ($cupom) {
             $desconto = $subtotal * ($cupom['desconto'] / 100);
@@ -45,30 +47,38 @@ class PedidoController
 
         $total = $subtotal + $frete - $desconto;
 
-        // Salvar pedido
         $pedidoModel = new Pedido();
         $pedidoId = $pedidoModel->create([
+            'email_cliente' => $email,
+            'produtos' => json_encode($carrinho),
             'subtotal' => $subtotal,
             'frete' => $frete,
             'desconto' => $desconto,
             'total' => $total,
             'cep' => $cep,
             'endereco' => $endereco,
-            'cidade' => $cidade,
-            'estado' => $estado,
             'status' => 'pendente',
         ]);
 
-        // Assumindo método para salvar itens do pedido
+        $estoqueModel = new Estoque();
+
         foreach ($carrinho as $produtoId => $qtd) {
-            $pedidoModel->addItem($pedidoId, $produtoId, $qtd);
+            $estoqueAtual = $estoqueModel->findByProduto($produtoId);
+
+            if ($estoqueAtual) {
+                $novaQuantidade = $estoqueAtual['quantidade'] - $qtd;
+
+                if ($novaQuantidade < 0) {
+                    $novaQuantidade = 0;
+                }
+
+                $estoqueModel->updateByProduto($produtoId, $novaQuantidade);
+            }
         }
 
-        // Limpar sessão carrinho e cupom
         unset($_SESSION['carrinho']);
         unset($_SESSION['cupom']);
 
-        // Redirecionar para página de confirmação
         header("Location: /pedido-finalizado?id={$pedidoId}");
     }
 

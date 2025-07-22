@@ -72,4 +72,22 @@ class Cupom extends Model
             'mensagem' => 'Cupom válido!'
         ];
     }
+
+    public function isValido($cupom)
+    {
+        if (!$cupom) {
+            return false;
+        }
+
+        if (!$cupom['ativo']) {
+            return false;
+        }
+
+        $hoje = date('Y-m-d');
+        if ($cupom['validade'] < $hoje) {
+            return false;
+        }
+
+        return true;
+    }
 }
