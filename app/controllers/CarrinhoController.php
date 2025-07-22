@@ -83,7 +83,7 @@ class CarrinhoController
 
         if ($cupom &&
             $cupomModel->isValido($cupom) &&
-            $subtotal >= $cupom['valor_minimo']) {
+            $subtotal >= $cupom['minimo']) {
             $_SESSION['cupom'] = $cupom;
         } else {
             $_SESSION['cupom'] = null;
